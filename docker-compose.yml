@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+
+  ## --------------------------------------------------
+  ## | Web Server - php:8.0.12-apache
+  ## --------------------------------------------------
+  assignment-core:
+    build:
+      context: .docker/publisher
+      dockerfile: Dockerfile
+      args:
+        - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
+    container_name: assignment-core
+    volumes:
+      - ./publisher/:/var/www/
+      - ./.docker/publisher/config/php.ini:/usr/local/etc/php/php.ini
+      - ./.data/publisher/log/webserver:/var/log/apache2
+    ports:
+      - "${BACKEND_PORT}:7090"
+    restart: always
+    environment:
+      - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
+      - EXCLUDE_PORTS=443
+    depends_on:
+      - assignment-db
+      - assignment-queue
+    env_file:
+      - .env
+
+  ## --------------------------------------------------
+  ## | Queue listener - php:8.0.12-cli
+  ## --------------------------------------------------
+  assignment-consumer:
+    build:
+      context: .docker/consumer
+      dockerfile: Dockerfile
+      args:
+        - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
+    container_name: assignment-consumer
+    volumes:
+      - ./consumer/:/var/www/
+      - ./.data/consumer/log:/var/log/supervisor/
+    restart: always
+    environment:
+      - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
+    depends_on:
+      - assignment-core
+    env_file:
+      - .env
+
+  ## --------------------------------------------------
+  ## | Database - MySQL latest
+  ## --------------------------------------------------
+  assignment-db:
+    image: mysql:latest
+    container_name: assignment-db
+    volumes:
+      - ./.data/database:/var/lib/mysql
+    ports:
+      - "${DB_HOST_PORT}:3306"
+    restart: on-failure
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+
+  ## --------------------------------------------------
+  ## | Queue - Rabbitmq
+  ## --------------------------------------------------
+  assignment-queue:
+    image: bitnami/rabbitmq
+    container_name: assignment-queue
+    volumes:
+      - ./.data/rabbitmq:/bitnami
+    restart: on-failure
+    environment:
+      - RABBITMQ_USERNAME=${RABBITMQ_USERNAME}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - RABBITMQ_NODE_TYPE=queue-disc
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:15672" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
