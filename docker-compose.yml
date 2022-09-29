@@ -1,86 +1,83 @@
-version: '3.8'
+version: '3.9'
 
 services:
 
   ## --------------------------------------------------
-  ## | Web Server - php:8.0.12-apache
-  ## --------------------------------------------------
-  assignment-core:
-    build:
-      context: .docker/publisher
-      dockerfile: Dockerfile
-      args:
-        - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
-    container_name: assignment-core
-    volumes:
-      - ./publisher/:/var/www/
-      - ./.docker/publisher/config/php.ini:/usr/local/etc/php/php.ini
-      - ./.data/publisher/log/webserver:/var/log/apache2
-    ports:
-      - "${BACKEND_PORT}:7090"
-    restart: always
-    environment:
-      - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
-      - EXCLUDE_PORTS=443
-    depends_on:
-      - assignment-db
-      - assignment-queue
-    env_file:
-      - .env
-
-  ## --------------------------------------------------
-  ## | Queue listener - php:8.0.12-cli
-  ## --------------------------------------------------
-  assignment-consumer:
-    build:
-      context: .docker/consumer
-      dockerfile: Dockerfile
-      args:
-        - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
-    container_name: assignment-consumer
-    volumes:
-      - ./consumer/:/var/www/
-      - ./.data/consumer/log:/var/log/supervisor/
-    restart: always
-    environment:
-      - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
-    depends_on:
-      - assignment-core
-    env_file:
-      - .env
-
-  ## --------------------------------------------------
   ## | Database - MySQL latest
   ## --------------------------------------------------
-  assignment-db:
+  snapdr-db:
     image: mysql:latest
-    container_name: assignment-db
+    container_name: snapdr-db
     volumes:
-      - ./.data/database:/var/lib/mysql
+      - ./.docker/.data/database:/var/lib/mysql
     ports:
       - "${DB_HOST_PORT}:3306"
-    restart: on-failure
+    restart: always
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
       - MYSQL_DATABASE=${DB_DATABASE}
       - MYSQL_USER=${DB_USERNAME}
       - MYSQL_PASSWORD=${DB_PASSWORD}
+    env_file:
+      - .env
 
   ## --------------------------------------------------
   ## | Queue - Rabbitmq
   ## --------------------------------------------------
-  assignment-queue:
-    image: bitnami/rabbitmq
-    container_name: assignment-queue
-    volumes:
-      - ./.data/rabbitmq:/bitnami
-    restart: on-failure
+  snapdr-rabbitmq:
+    container_name: "rabbitmq"
+    image: rabbitmq:3.8-management-alpine
     environment:
-      - RABBITMQ_USERNAME=${RABBITMQ_USERNAME}
-      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
-      - RABBITMQ_NODE_TYPE=queue-disc
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:15672" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+    ports:
+      - '${RABBITMQ_PORT}:5672'
+      - '${RABBITMQ_WEB_PORT}:15672'
+    env_file:
+      - .env
+
+  ## --------------------------------------------------
+  ## | Web Server - php:8.1.0-apache
+  ## --------------------------------------------------
+  snapdr-publisher:
+    build:
+      context: .docker/publisher
+      dockerfile: Dockerfile
+      args:
+        - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
+    container_name: snapdr-snapdr-publisher
+    volumes:
+      - ./snapdr-publisher/:/var/www/
+      - ./.docker/snapdr-publisher/config/php.ini:/usr/local/etc/php/php.ini
+    ports:
+      - "${BACKEND_PORT}:8105"
+    restart: always
+    environment:
+      - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
+      - EXCLUDE_PORTS=443
+    depends_on:
+      - snapdr-db
+      - snapdr-rabbitm
+    env_file:
+      - .env
+
+  ## --------------------------------------------------
+  ## | Queue listener - php:8.1.0-cli
+  ## --------------------------------------------------
+  snapdr-consumer:
+    build:
+      context: .docker/consumer
+      dockerfile: Dockerfile
+      args:
+        - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
+    container_name: snapdr-snapdr-consumer
+    volumes:
+      - ./snapdr-consumer/:/var/www/
+      - ./.docker/.data/consumer/log:/var/log/supervisor/
+    restart: always
+    environment:
+      - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
+    depends_on:
+      - snapdr-publisher
+    env_file:
+      - .env

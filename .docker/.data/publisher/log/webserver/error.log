@@ -1,0 +1,14 @@
+[Wed Sep 28 11:23:46.522032 2022] [mpm_prefork:notice] [pid 7] AH00163: Apache/2.4.51 (Debian) PHP/8.0.12 configured -- resuming normal operations
+[Wed Sep 28 11:23:46.524928 2022] [core:notice] [pid 7] AH00094: Command line: 'apache2 -D FOREGROUND'
+[Wed Sep 28 13:27:49.158092 2022] [mpm_prefork:notice] [pid 8] AH00163: Apache/2.4.51 (Debian) PHP/8.0.12 configured -- resuming normal operations
+[Wed Sep 28 13:27:49.159844 2022] [core:notice] [pid 8] AH00094: Command line: 'apache2 -D FOREGROUND'
+[Wed Sep 28 15:24:29.735191 2022] [mpm_prefork:notice] [pid 7] AH00163: Apache/2.4.51 (Debian) PHP/8.0.12 configured -- resuming normal operations
+[Wed Sep 28 15:24:29.736803 2022] [core:notice] [pid 7] AH00094: Command line: 'apache2 -D FOREGROUND'
+[Wed Sep 28 16:06:26.217121 2022] [mpm_prefork:notice] [pid 7] AH00163: Apache/2.4.51 (Debian) PHP/8.0.12 configured -- resuming normal operations
+[Wed Sep 28 16:06:26.218750 2022] [core:notice] [pid 7] AH00094: Command line: 'apache2 -D FOREGROUND'
+[Wed Sep 28 16:08:45.970731 2022] [mpm_prefork:notice] [pid 9] AH00163: Apache/2.4.51 (Debian) PHP/8.0.12 configured -- resuming normal operations
+[Wed Sep 28 16:08:45.972459 2022] [core:notice] [pid 9] AH00094: Command line: 'apache2 -D FOREGROUND'
+[Wed Sep 28 22:07:16.619220 2022] [mpm_prefork:notice] [pid 7] AH00163: Apache/2.4.51 (Debian) PHP/8.0.12 configured -- resuming normal operations
+[Wed Sep 28 22:07:16.625318 2022] [core:notice] [pid 7] AH00094: Command line: 'apache2 -D FOREGROUND'
+[Wed Sep 28 22:22:14.894637 2022] [mpm_prefork:notice] [pid 8] AH00163: Apache/2.4.51 (Debian) PHP/8.0.12 configured -- resuming normal operations
+[Wed Sep 28 22:22:14.897757 2022] [core:notice] [pid 8] AH00094: Command line: 'apache2 -D FOREGROUND'

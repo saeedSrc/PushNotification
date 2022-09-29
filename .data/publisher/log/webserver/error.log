@@ -1,2 +1,0 @@
-[Wed Sep 28 11:23:46.522032 2022] [mpm_prefork:notice] [pid 7] AH00163: Apache/2.4.51 (Debian) PHP/8.0.12 configured -- resuming normal operations
-[Wed Sep 28 11:23:46.524928 2022] [core:notice] [pid 7] AH00094: Command line: 'apache2 -D FOREGROUND'

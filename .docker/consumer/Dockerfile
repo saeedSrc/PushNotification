@@ -1,4 +1,4 @@
-FROM php:8.0.12-cli
+FROM php:8.1.0-cli
 
 LABEL maintainer="saeed rasooli"
 
