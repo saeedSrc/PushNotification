@@ -2,12 +2,10 @@ FROM php:8.1.0-apache
 
 LABEL maintainer="saeed rasooli"
 
-ARG WWW_DATA_USER_ID
+ARG DATA_USER_ID
 
 # Install base packages
-RUN apt-get update -y && \
-    apt-get install -y \
-        git \
+RUN apt-get update -y &&  apt-get install -y && apt-get install git \
         libzip-dev \
         zlib1g-dev \
         libssl-dev \
@@ -20,17 +18,17 @@ RUN apt-get update -y && \
         zip
 
 RUN docker-php-ext-configure bcmath --enable-bcmath && \
-    docker-php-ext-install pcntl bcmath
-
-
-RUN  usermod -u ${WWW_DATA_USER_ID} www-data && \
-    groupmod -g ${WWW_DATA_USER_ID} www-data
-
+    docker-php-ext-install pcntl bcmath \
 
 # Installing composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php composer-setup.php && php -r "unlink('composer-setup.php');" \
-    && mv composer.phar /usr/local/bin/composer
+    && mv composer.phar /usr/local/bin/composer \
+
+
+RUN  usermod -u ${DATA_USER_ID} www-data && \
+    groupmod -g ${DATA_USER_ID} www-data
+
 
 # Move some helper commands
 COPY ["./commands/*", "/usr/local/bin/"]

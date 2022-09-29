@@ -2,12 +2,10 @@ FROM php:8.1.0-cli
 
 LABEL maintainer="saeed rasooli"
 
-ARG WWW_DATA_USER_ID
+ARG DATA_USER_ID
 
 # Install base packages
-RUN apt-get update -y && \
-    apt-get install -y \
-        git \
+RUN apt-get update -y && apt-get install -y && apt-get install git \
         libzip-dev \
         zlib1g-dev \
         libssl-dev \
@@ -21,18 +19,17 @@ RUN apt-get update -y && \
         pdo_mysql \
         zip
 
-RUN docker-php-ext-configure bcmath --enable-bcmath && \
-    docker-php-ext-install pcntl bcmath
-
-
-RUN usermod -u ${WWW_DATA_USER_ID} www-data && \
-    groupmod -g ${WWW_DATA_USER_ID} www-data
-
-
 # Installing composer
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php composer-setup.php && php -r "unlink('composer-setup.php');" \
     && mv composer.phar /usr/local/bin/composer
+
+RUN docker-php-ext-configure bcmath --enable-bcmath && \
+    docker-php-ext-install pcntl bcmath
+
+
+RUN usermod -u ${DATA_USER_ID} www-data && \
+    groupmod -g ${DATA_USER_ID} www-data
 
 # Config apache and copy entrypoint
 COPY ./config/* /etc/supervisor/conf.d/

@@ -44,7 +44,7 @@ services:
       context: .docker/publisher
       dockerfile: Dockerfile
       args:
-        - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
+        - DATA_USER_ID=${DATA_USER_ID}
     container_name: snapdr-snapdr-publisher
     volumes:
       - ./snapdr-publisher/:/var/www/
@@ -53,7 +53,7 @@ services:
       - "${BACKEND_PORT}:8105"
     restart: always
     environment:
-      - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
+      - DATA_USER_ID=${DATA_USER_ID}
       - EXCLUDE_PORTS=443
     depends_on:
       - snapdr-db
@@ -69,14 +69,14 @@ services:
       context: .docker/consumer
       dockerfile: Dockerfile
       args:
-        - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
+        - DATA_USER_ID=${DATA_USER_ID}
     container_name: snapdr-snapdr-consumer
     volumes:
       - ./snapdr-consumer/:/var/www/
       - ./.docker/.data/consumer/log:/var/log/supervisor/
     restart: always
     environment:
-      - WWW_DATA_USER_ID=${WWW_DATA_USER_ID}
+      - DATA_USER_ID=${DATA_USER_ID}
     depends_on:
       - snapdr-publisher
     env_file:
